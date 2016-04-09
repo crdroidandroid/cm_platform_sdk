@@ -28,13 +28,13 @@ public class Build {
     public static final String UNKNOWN = "unknown";
 
     /** A build ID utilized to distinguish cyanogenmod versions */
-    public static final String CYANOGENMOD_VERSION = "ro.cm.version";
+    public static final String CYANOGENMOD_VERSION = getString("ro.cm.version");
 
     /** A build ID utilized to distinguish crDroid versions */
     public static final String CRDROID_VERSION = "ro.crdroid.version";
 
     /** A build ID string meant for displaying to the user */
-    public static final String CYANOGENMOD_DISPLAY_VERSION = "ro.cm.display.version";
+    public static final String CYANOGENMOD_DISPLAY_VERSION = getString("ro.cm.display.version");
 
     /** A build ID string meant for displaying to the user */
     public static final String CRDROID_DISPLAY_VERSION = "ro.crdroid.display.version";
@@ -173,5 +173,9 @@ public class Build {
             return UNKNOWN;
         }
         return name;
+    }
+
+    private static String getString(String property) {
+        return SystemProperties.get(property, UNKNOWN);
     }
 }
