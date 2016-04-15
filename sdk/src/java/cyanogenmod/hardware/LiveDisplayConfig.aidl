@@ -14,16 +14,6 @@
  * limitations under the License.
  */
 
-package cyanogenmod.weatherservice;
+package cyanogenmod.hardware;
 
-import cyanogenmod.weatherservice.IWeatherProviderServiceClient;
-import cyanogenmod.weather.RequestInfo;
-
-/** @hide */
-oneway interface IWeatherProviderService {
-    void processWeatherUpdateRequest(in RequestInfo request);
-    void processCityNameLookupRequest(in RequestInfo request);
-    void setServiceClient(in IWeatherProviderServiceClient client);
-    void cancelOngoingRequests();
-    void cancelRequest(int requestId);
-}
+parcelable LiveDisplayConfig;
