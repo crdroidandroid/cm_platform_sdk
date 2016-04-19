@@ -19,6 +19,7 @@ import static cyanogenmod.hardware.LiveDisplayManager.FEATURE_MANAGED_OUTDOOR_MO
 import static cyanogenmod.hardware.LiveDisplayManager.MODE_DAY;
 import static cyanogenmod.hardware.LiveDisplayManager.MODE_FIRST;
 import static cyanogenmod.hardware.LiveDisplayManager.MODE_LAST;
+import static cyanogenmod.hardware.LiveDisplayManager.MODE_OFF;
 import static cyanogenmod.hardware.LiveDisplayManager.MODE_OUTDOOR;
 
 import android.app.Notification;
@@ -184,22 +185,26 @@ public class LiveDisplayService extends SystemService {
             mDisplayManager = (DisplayManager) getContext().getSystemService(
                     Context.DISPLAY_SERVICE);
             mDisplayManager.registerDisplayListener(mDisplayListener, null);
+            updateDisplayState(mDisplayManager.getDisplay(Display.DEFAULT_DISPLAY).getState());
 
             PowerManagerInternal pmi = LocalServices.getService(PowerManagerInternal.class);
             pmi.registerLowPowerModeObserver(mLowPowerModeListener);
+
+            if (mConfig.hasModeSupport()) {
+                mModeObserver = new ModeObserver(mHandler);
+                mModeObserver.update();
+
+                mContext.registerReceiver(mNextModeReceiver,
+                        new IntentFilter(ACTION_NEXT_MODE));
+            }
 
             mTwilightManager = LocalServices.getService(TwilightManager.class);
             mTwilightManager.registerListener(mTwilightListener, mHandler);
             updateTwilight();
 
-            updateDisplayState(mDisplayManager.getDisplay(Display.DEFAULT_DISPLAY).getState());
-
-            mModeObserver = new ModeObserver(mHandler);
-            mModeObserver.update();
-
-            mContext.registerReceiver(mNextModeReceiver,
-                    new IntentFilter(ACTION_NEXT_MODE));
-            publishCustomTile();
+            for (int i = 0; i < mFeatures.size(); i++) {
+                mFeatures.get(i).onSettingsChanged(null);
+            }
 
             mInitialized = true;
         }
@@ -230,23 +235,30 @@ public class LiveDisplayService extends SystemService {
             next = 0;
         }
 
-        int nextMode = 0;
+        int nextMode;
 
         while (true) {
             nextMode = Integer.valueOf(mTileValues[next]);
-            // Skip outdoor mode if it's unsupported, and skip the day setting
-            // if it's the same as the off setting
-            if  (((!mConfig.hasFeature(MODE_OUTDOOR) ||
-                    mConfig.hasFeature(FEATURE_MANAGED_OUTDOOR_MODE)
-                            && nextMode == MODE_OUTDOOR)) ||
-                    (mCTC.getDayColorTemperature() == mConfig.getDefaultDayTemperature()
-                            && nextMode == MODE_DAY)) {
-                next++;
-                if (next >= mTileValues.length) {
-                    next = 0;
+            if (nextMode == MODE_OUTDOOR) {
+                // Only accept outdoor mode if it's supported by the hardware
+                if (mConfig.hasFeature(MODE_OUTDOOR)
+                        && !mConfig.hasFeature(FEATURE_MANAGED_OUTDOOR_MODE)) {
+                    break;
+                }
+            } else if (nextMode == MODE_DAY) {
+                // Skip the day setting if it's the same as the off setting
+                if (mCTC.getDayColorTemperature() != mConfig.getDefaultDayTemperature()) {
+                    break;
                 }
             } else {
+                // every other mode doesn't have any preconstraints
                 break;
+            }
+
+            // If we come here, we decided to skip the mode
+            next++;
+            if (next >= mTileValues.length) {
+                next = 0;
             }
         }
 
@@ -271,7 +283,7 @@ public class LiveDisplayService extends SystemService {
                     .setOnClickIntent(getCustomTileNextModePendingIntent())
                     .shouldCollapsePanel(false)
                     .build();
-            statusBarManager.publishTileAsUser(QSConstants.TILE_LIVE_DISPLAY,
+            statusBarManager.publishTileAsUser(QSConstants.DYNAMIC_TILE_LIVE_DISPLAY,
                     LiveDisplayService.class.hashCode(), tile, user);
         } finally {
             Binder.restoreCallingIdentity(token);
@@ -284,7 +296,7 @@ public class LiveDisplayService extends SystemService {
         long token = Binder.clearCallingIdentity();
         try {
             CMStatusBarManager statusBarManager = CMStatusBarManager.getInstance(mContext);
-            statusBarManager.removeTileAsUser(QSConstants.TILE_LIVE_DISPLAY,
+            statusBarManager.removeTileAsUser(QSConstants.DYNAMIC_TILE_LIVE_DISPLAY,
                     LiveDisplayService.class.hashCode(), new UserHandle(userId));
         } finally {
             Binder.restoreCallingIdentity(token);
@@ -310,9 +322,7 @@ public class LiveDisplayService extends SystemService {
         @Override
         public void onReceive(Context context, Intent intent) {
             int mode = intent.getIntExtra(EXTRA_NEXT_MODE, mConfig.getDefaultMode());
-            if (mConfig.hasFeature(mode) && mode >= MODE_FIRST && mode <= MODE_LAST) {
-                putInt(CMSettings.System.DISPLAY_TEMPERATURE_MODE, mode);
-            }
+            mModeObserver.setMode(mode);
         }
     };
 
@@ -332,11 +342,7 @@ public class LiveDisplayService extends SystemService {
         public boolean setMode(int mode) {
             mContext.enforceCallingOrSelfPermission(
                     cyanogenmod.platform.Manifest.permission.MANAGE_LIVEDISPLAY, null);
-            if (mConfig.hasFeature(mode) && mode >= MODE_FIRST && mode <= MODE_LAST) {
-                putInt(CMSettings.System.DISPLAY_TEMPERATURE_MODE, mode);
-                return true;
-            }
-            return false;
+            return mModeObserver.setMode(mode);
         }
 
         @Override
@@ -496,13 +502,21 @@ public class LiveDisplayService extends SystemService {
 
         @Override
         protected void update() {
-            mHandler.obtainMessage(MSG_MODE_CHANGED, getMode(), 0).sendToTarget();
+            mHandler.obtainMessage(MSG_MODE_CHANGED, getMode()).sendToTarget();
             publishCustomTile();
         }
 
         int getMode() {
             return getInt(CMSettings.System.DISPLAY_TEMPERATURE_MODE,
                     mConfig.getDefaultMode());
+        }
+
+        boolean setMode(int mode) {
+            if (mConfig.hasFeature(mode) && mode >= MODE_FIRST && mode <= MODE_LAST) {
+                putInt(CMSettings.System.DISPLAY_TEMPERATURE_MODE, mode);
+                return true;
+            }
+            return false;
         }
     }
 
@@ -659,7 +673,8 @@ public class LiveDisplayService extends SystemService {
                     break;
                 case MSG_MODE_CHANGED:
                     stopNudgingMe();
-                    updateMode(msg.arg1);
+                    int mode = msg.obj == null ? MODE_OFF : (Integer)msg.obj;
+                    updateMode(mode);
                     break;
             }
         }
