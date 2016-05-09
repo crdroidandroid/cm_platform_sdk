@@ -81,6 +81,7 @@
     <!-- Notification and battery light -->
     <java-symbol type="bool" name="config_adjustableNotificationLedBrightness" />
     <java-symbol type="bool" name="config_multipleNotificationLeds" />
+    <java-symbol type="bool" name="config_useSegmentedBatteryLed" />
 
     <!-- Quick Settings tile defaults -->
     <java-symbol type="string" name="config_defaultQuickSettingsTiles" />
@@ -112,4 +113,9 @@
 
     <!-- External CM specific core services -->
     <java-symbol type="array" name="config_externalCMServices" />
+
+    <!-- Themes tile -->
+    <java-symbol type="string" name="qs_themes_label" />
+    <java-symbol type="string" name="qs_themes_content_description" />
+    <java-symbol type="drawable" name="ic_qs_themes" />
 </resources>
