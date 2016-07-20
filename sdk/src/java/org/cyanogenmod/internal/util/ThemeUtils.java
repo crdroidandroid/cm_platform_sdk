@@ -88,7 +88,6 @@ public class ThemeUtils {
         SUPPORTED_THEME_COMPONENTS.add(ThemesColumns.MODIFIES_OVERLAYS);
         SUPPORTED_THEME_COMPONENTS.add(ThemesColumns.MODIFIES_RINGTONES);
         SUPPORTED_THEME_COMPONENTS.add(ThemesColumns.MODIFIES_STATUS_BAR);
-        SUPPORTED_THEME_COMPONENTS.add(ThemesColumns.MODIFIES_STATUSBAR_HEADERS);
     }
 
     // Constants for theme change broadcast
@@ -630,8 +629,7 @@ public class ThemeUtils {
     public static boolean isPerAppThemeComponent(String component) {
         return !(DEFAULT_PKG.equals(component)
                 || ThemeConfig.SYSTEMUI_STATUS_BAR_PKG.equals(component)
-                || ThemeConfig.SYSTEMUI_NAVBAR_PKG.equals(component)
-                || ThemeConfig.SYSTEMUI_STATUSBAR_HEADER_PKG.equals(component));
+                || ThemeConfig.SYSTEMUI_NAVBAR_PKG.equals(component));
     }
 
     /**

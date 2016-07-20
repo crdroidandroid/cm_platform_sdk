@@ -305,8 +305,6 @@ public class ThemeManagerService extends CMSystemService {
         currentThemeMap.put(ThemesColumns.MODIFIES_STATUS_BAR, config.getOverlayForStatusBar());
         currentThemeMap.put(ThemesColumns.MODIFIES_NAVIGATION_BAR,
                 config.getOverlayForNavBar());
-        currentThemeMap.put(ThemesColumns.MODIFIES_STATUSBAR_HEADERS,
-                config.getOverlayForHeaders());
         currentThemeMap.put(ThemesColumns.MODIFIES_OVERLAYS, config.getOverlayPkgName());
 
         // Look at each component's theme (that we care about at least) and check compatibility
@@ -800,7 +798,6 @@ public class ThemeManagerService extends CMSystemService {
                 request.getIconsThemePackageName() != null ||
                 request.getStatusBarThemePackageName() != null ||
                 request.getNavBarThemePackageName() != null ||
-                request.getHeadersThemePackageName() != null ||
                 request.getPerAppOverlays().size() > 0;
     }
 
@@ -831,11 +828,6 @@ public class ThemeManagerService extends CMSystemService {
         if (request.getNavBarThemePackageName() != null) {
             builder.overlay(ThemeConfig.SYSTEMUI_NAVBAR_PKG, pkgName == null ?
                     request.getNavBarThemePackageName() : pkgName);
-        }
-
-        if (request.getHeadersThemePackageName() != null) {
-            builder.overlay(ThemeConfig.SYSTEMUI_STATUSBAR_HEADER_PKG, pkgName == null ?
-                    request.getHeadersThemePackageName() : pkgName);
         }
 
         // check for any per app overlays being applied
@@ -1199,7 +1191,6 @@ public class ThemeManagerService extends CMSystemService {
                     if (ThemesColumns.MODIFIES_OVERLAYS.equals(key) ||
                             ThemesColumns.MODIFIES_NAVIGATION_BAR.equals(key) ||
                             ThemesColumns.MODIFIES_STATUS_BAR.equals(key) ||
-                            ThemesColumns.MODIFIES_STATUSBAR_HEADERS.equals(key) ||
                             ThemesColumns.MODIFIES_ICONS.equals(key)) {
                         String pkgName = componentMap.get(key);
                         if (mThemesToProcessQueue.indexOf(pkgName) > 0) {
