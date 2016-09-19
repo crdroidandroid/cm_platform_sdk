@@ -674,6 +674,7 @@ package cyanogenmod.os {
     field public static final int DRAGON_FRUIT = 4; // 0x4
     field public static final int ELDERBERRY = 5; // 0x5
     field public static final int FIG = 6; // 0x6
+    field public static final int GUAVA = 7; // 0x7
   }
 
   public final class Concierge {
@@ -742,28 +743,12 @@ package cyanogenmod.platform {
     ctor public R.bool();
   }
 
-  public static final class R.color {
-    ctor public R.color();
-  }
-
-  public static final class R.dimen {
-    ctor public R.dimen();
-  }
-
   public static final class R.drawable {
     ctor public R.drawable();
   }
 
-  public static final class R.id {
-    ctor public R.id();
-  }
-
   public static final class R.integer {
     ctor public R.integer();
-  }
-
-  public static final class R.layout {
-    ctor public R.layout();
   }
 
   public static final class R.string {
@@ -791,6 +776,64 @@ package cyanogenmod.power {
     field public static final int PROFILE_HIGH_PERFORMANCE = 2; // 0x2
     field public static final int PROFILE_POWER_SAVE = 0; // 0x0
     field public static final java.lang.String TAG = "PerformanceManager";
+  }
+
+}
+
+package cyanogenmod.preference {
+
+  public class CMGlobalSettingSwitchPreference extends SwitchPreference {
+    ctor public CMGlobalSettingSwitchPreference(android.content.Context, android.util.AttributeSet, int);
+    ctor public CMGlobalSettingSwitchPreference(android.content.Context, android.util.AttributeSet);
+    ctor public CMGlobalSettingSwitchPreference(android.content.Context);
+    method protected boolean getPersistedBoolean(boolean);
+    method protected boolean isPersisted();
+    method protected boolean persistBoolean(boolean);
+  }
+
+  public class CMSecureSettingListPreference extends ListPreference {
+    ctor public CMSecureSettingListPreference(android.content.Context, android.util.AttributeSet, int);
+    ctor public CMSecureSettingListPreference(android.content.Context, android.util.AttributeSet);
+    method public int getIntValue(int);
+    method protected java.lang.String getPersistedString(java.lang.String);
+    method protected boolean isPersisted();
+    method protected boolean persistString(java.lang.String);
+  }
+
+  public class CMSecureSettingSwitchPreference extends SwitchPreference {
+    ctor public CMSecureSettingSwitchPreference(android.content.Context, android.util.AttributeSet, int);
+    ctor public CMSecureSettingSwitchPreference(android.content.Context, android.util.AttributeSet);
+    ctor public CMSecureSettingSwitchPreference(android.content.Context);
+    method protected boolean getPersistedBoolean(boolean);
+    method protected boolean isPersisted();
+    method protected boolean persistBoolean(boolean);
+  }
+
+  public class CMSystemSettingListPreference extends ListPreference {
+    ctor public CMSystemSettingListPreference(android.content.Context, android.util.AttributeSet, int);
+    ctor public CMSystemSettingListPreference(android.content.Context, android.util.AttributeSet);
+    method public int getIntValue(int);
+    method protected java.lang.String getPersistedString(java.lang.String);
+    method protected boolean isPersisted();
+    method protected boolean persistString(java.lang.String);
+  }
+
+  public class CMSystemSettingSwitchPreference extends SwitchPreference {
+    ctor public CMSystemSettingSwitchPreference(android.content.Context, android.util.AttributeSet, int);
+    ctor public CMSystemSettingSwitchPreference(android.content.Context, android.util.AttributeSet);
+    ctor public CMSystemSettingSwitchPreference(android.content.Context);
+    method protected boolean getPersistedBoolean(boolean);
+    method protected boolean isPersisted();
+    method protected boolean persistBoolean(boolean);
+  }
+
+  public class SystemSettingSwitchPreference extends SwitchPreference {
+    ctor public SystemSettingSwitchPreference(android.content.Context, android.util.AttributeSet, int);
+    ctor public SystemSettingSwitchPreference(android.content.Context, android.util.AttributeSet);
+    ctor public SystemSettingSwitchPreference(android.content.Context);
+    method protected boolean getPersistedBoolean(boolean);
+    method protected boolean isPersisted();
+    method protected boolean persistBoolean(boolean);
   }
 
 }
@@ -848,7 +891,7 @@ package cyanogenmod.profiles {
     field public static final int PROFILE_CONNECTION_SYNC = 5; // 0x5
     field public static final int PROFILE_CONNECTION_WIFI = 1; // 0x1
     field public static final int PROFILE_CONNECTION_WIFIAP = 2; // 0x2
-    field public static final int PROFILE_CONNECTION_WIMAX = 3; // 0x3
+    field public static final deprecated int PROFILE_CONNECTION_WIMAX = 3; // 0x3
   }
 
   public static class ConnectionSettings.BooleanState {

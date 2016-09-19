@@ -16,13 +16,10 @@
 
 package cyanogenmod.app;
 
-import cyanogenmod.app.IStatusBarCustomTileHolder;
 import cyanogenmod.app.StatusBarPanelCustomTile;
 
 /** @hide */
-oneway interface ICustomTileListener
-{
-    void onListenerConnected();
-    void onCustomTilePosted(in IStatusBarCustomTileHolder customTileHolder);
-    void onCustomTileRemoved(in IStatusBarCustomTileHolder customTileHolder);
+interface IStatusBarCustomTileHolder {
+    /** Fetch the held StatusBarPanelCustomTile. This method should only be called once per Holder */
+    StatusBarPanelCustomTile get();
 }
